@@ -8,8 +8,14 @@
       width="1100px"
       @close="cancel"
     >
-      <div ref="testSvg" class="testSvg" v-loading="loading"></div>
-
+      <div class="shot-body" v-loading="loading">
+        <div class="selected-shot">
+          <img v-if="selectedShotSrc" :src="selectedShotSrc" />
+        </div>
+        <div ref="shotList" class="shot-list">
+          <img v-for="(img,$index) in pageShots" :key="$index" :src="img" @click="selected($index)" :class="{active: $index == activeIndex}"/>
+        </div>
+      </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="download" :disabled="btnDisabled">{{
           btnText
@@ -28,7 +34,10 @@ export default {
       visible: false,
       loading: true,
       btnText: "下载",
+      pageShots: [],
       btnDisabled: false,
+      activeIndex: 0,
+      selectedShotSrc: [],
     };
   },
   computed: {
@@ -48,6 +57,9 @@ export default {
 
       CTemplate.generateGif().then((rt) => {
         this.loading = false;
+        this.pageShots = [];
+        this.pageShots.push(...CTemplate.pageShots);
+        this.selected(0)
       });
     },
     download() {
@@ -61,23 +73,41 @@ export default {
     cancel() {
       this.visible = false;
       this.loading = true;
-      this.$refs.testSvg.innerHTML = '';
-      console.log(this.$refs)
-      console.log(this.$refs.testSvg)
+      this.$refs.shotList.innerHTML = "";
+      
     },
+    selected(index) {
+      this.selectedShotSrc = this.pageShots[index];
+      this.activeIndex = index;
+    }
   },
 };
 </script>
 
 <style lang="scss">
-.testSvg {
-  height: 540px;
+.shot-list {
   overflow: auto;
+  display: flex;
+  align-items: flex-end;
   img {
-    width: 320px;
+    width: 160px;
     float: left;
     border: 1px solid #ccc;
     margin: 0 5px 5px 0;
+
+    &.active {
+      border: 1px solid #ff7700;
+    }
+  }
+}
+
+.selected-shot {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+
+  img {
+    width: 320px;
   }
 }
 </style>

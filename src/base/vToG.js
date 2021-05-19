@@ -1,4 +1,18 @@
-<svg
+
+import Utils from '../utils/index'
+class CVideoTo {
+    constructor(data) {
+        this.width = 600;
+        this.height = 600;
+
+        this.fps = 30;
+        this.gifWidth = this.width;
+        this.gifHeight = this.height;
+    }
+    toSvg(isDownload) {
+
+        return `
+            <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink"
             viewBox="0 0 600 600"
@@ -23,3 +37,8 @@
             </rect>
             </g>
         </svg>
+        `
+    }
+}
+
+export default new CVideoTo();

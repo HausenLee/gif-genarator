@@ -1,6 +1,6 @@
 export default {
     state: {
-        type: 0,
+        type: 1,
         generatorOptions: {
             width: 600,
             height: 600,

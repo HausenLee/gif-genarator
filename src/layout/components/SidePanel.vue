@@ -3,7 +3,7 @@
       <div class="item">
           <div class="item-label">创建方式</div>
           <div class="item-value">
-              <el-select v-model="type" placeholder="请选择">
+              <el-select v-model="generatorType" placeholder="请选择">
                 <el-option
                     v-for="item in createTypes"
                     :key="item.value"
@@ -17,19 +17,19 @@
       <div class="item">
           <div class="item-label">宽度</div>
           <div class="item-value">
-              <el-input v-model="options.width" placeholder="单位px"></el-input>
+              <el-input v-model="generatorOptions.width" placeholder="单位px"></el-input>
           </div>
       </div>
       <div class="item">
           <div class="item-label">高度</div>
           <div class="item-value">
-              <el-input v-model="options.height" placeholder="单位px"></el-input>
+              <el-input v-model="generatorOptions.height" placeholder="单位px"></el-input>
           </div>
       </div>
       <div class="item">
           <div class="item-label">FPS</div>
           <div class="item-value">
-              <el-input v-model="options.fps" placeholder="10~30之间"></el-input>
+              <el-input v-model="generatorOptions.fps" placeholder="10~30之间"></el-input>
           </div>
       </div>
   </div>
@@ -40,10 +40,22 @@ import { mapState } from 'vuex'
 export default {
     name: 'SidePanel',
     computed: {
-        ...mapState({
-            type: state => state.type,
-            options: state => state.generatorOptions
-        })
+        generatorType: {
+          get() {
+            return this.$store.state.type;
+          },
+          set(val) {
+            this.$store.state.type = val;
+          }
+        },
+        generatorOptions: {
+           get() {
+            return this.$store.state.generatorOptions;
+          },
+          set(val) {
+            this.$store.state.generatorOptions = val;
+          }
+        }
     },
     data() {
       return {
@@ -52,9 +64,12 @@ export default {
           label: '图片生成'
         }, {
           value: 1,
-          label: '视频生成'
+          label: '动画生成'
         }, {
           value: 2,
+          label: '视频生成'
+        }, {
+          value: 3,
           label: '摄像头生成'
         }],
       }

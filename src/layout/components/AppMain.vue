@@ -1,38 +1,57 @@
 <template>
-    <div class="main">
-        <div class="container images-container" v-html="svgHTML"></div>
+  <div class="main">
+    <components :is="componentName" />
+    <div class="svgTest">
+        <!-- <video id="testVideo" width="600" height="600" controls >
+            <source src="imgs/video2.mp4" type="video/mp4" />
+        </video> -->
     </div>
+  </div>
 </template>
 
 <script>
-import CTemplate from '../../base/index'
+import ImagesToGif from "../../components/container/ImagesToGif";
+import AnimateToGif from "../../components/container/AnimateToGif";
+import VideoToGif from "../../components/container/VideoToGif";
+import WebcamToGif from "../../components/container/WebcamToGif";
+
+import { mapState } from "vuex";
 export default {
-    name: 'AppMain',
-    data() {
-        return {
-            svgHTML: '',
-        }
+  name: "AppMain",
+  components: { ImagesToGif, AnimateToGif, VideoToGif, WebcamToGif },
+  data() {
+    return {};
+  },
+  computed: {
+    ...mapState({
+      type: (state) => state.type,
+    }),
+    componentName() {
+      let name = "ImagesToGif";
+      switch (this.type) {
+        case 1:
+            name = "AnimateToGif";
+          break;
+        case 2:
+            name = "VideoToGif";
+          break;
+        case 3:
+            name = "WebcamToGif";
+          break;
+      }
+      return name
     },
-    mounted() {
-        this.svgHTML = CTemplate.toSvg();
-    }
-}
+  },
+  mounted() {},
+};
 </script>
 
 <style lang="scss" scoped>
 .main {
-    flex-grow: 1;
-    position: relative;
-    .container {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%,-50%);
-        background-color: #fff;
-        font-size: 0;
-    }
+  flex-grow: 1;
+  position: relative;
 
-    .testSvg {
+   .svgTest {
         background-color: #fff;
 
         position: absolute;

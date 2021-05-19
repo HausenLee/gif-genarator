@@ -67,7 +67,7 @@ class CTemplate {
         return `
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${this.width} ${this.height}" width="${this.width}" height="${this.height}">
                 <g transform="translate(0,0)">
-                    <rect x="0" y="0" height="${this.height}" width="${this.width}" style="fill: #fff" />
+                    <rect x="0" y="0" height="${this.height}" width="${this.width}" style="fill: rgba(0,0,0,0)" />
                 </g>
                 ${eleSvg}
             </svg>
@@ -97,10 +97,6 @@ class CTemplate {
                     svgBlob = new Blob([svgStr], {type: "image/svg+xml"});
                     svgBlobUrl = DOMURL.createObjectURL(svgBlob);
                     pageShots.push(svgBlobUrl);
-
-                    var image = new Image();
-                    image.src = svgBlobUrl;
-                    document.querySelector('.testSvg').appendChild(image);
                 } else {
                     clearInterval(timer);
                     resolve(pageShots);
@@ -138,16 +134,12 @@ class CTemplate {
                 })
             })
         })
-
-        
     }
     download() {
         const images = this.pageShots;
         const interval = 1 / this.fps;
         const gifWidth = this.gifWidth;
         const gifHeight = this.gifHeight;
-
-        console.log(this.fps,this.gifWidth,this.gifHeight);
 
         return new Promise((resolcve,reject) => {
             window.gifshot.createGIF({

@@ -6,6 +6,8 @@ export default class CGif extends CElement {
         this.src = data.src;
         this.base64 = '';
         this.shotBase64 = [];
+        this.width = this.height = 200
+
     }
     initBase64() {
         return new Promise((resolve,reject) => {
@@ -46,10 +48,14 @@ export default class CGif extends CElement {
     
     toSvg(isAll = true,isDownload) {
         const src = this.src;
-        return `
+        return isDownload ? `
             <g transform="translate(${this.left},${this.top})">
                 <image xlink:href="${src}" width="200" height="200"/>
             </g>
-        `;
+        ` : `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${this.width} ${this.height}" width="${this.width}" height="${this.height}">
+                <g>
+                    <image xlink:href="${src}" width="200" height="200"/>
+                </g>
+            </svg>`;
     }
 }

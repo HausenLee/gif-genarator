@@ -6,7 +6,6 @@ export default class CImage extends TheElement {
         this.src = data.src;
         this.base64 = '';
         this.width = this.height = 200
-        
     }
     initBase64() {
         return new Promise((resolve,reject) => {
@@ -41,10 +40,14 @@ export default class CImage extends TheElement {
     }
     toSvg(isAll = true,isDownload) {
         const src = isDownload? this.base64 : this.src;
-        return `
+        return isDownload ? `
             <g transform="translate(${this.left},${this.top})">
                 <image xlink:href="${src}" width="${this.width}" height="${this.height}"/>
             </g>
-        `;
+        ` : `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${this.width} ${this.height}" width="${this.width}" height="${this.height}">
+                <g>
+                    <image xlink:href="${src}" width="${this.width}" height="${this.height}"/>
+                </g>
+            </svg>`;
     }
 }

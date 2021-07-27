@@ -9,7 +9,7 @@ Vue.config.productionTip = false
 Vue.use(ElementUI);
 Vue.use(Vuex)
 const store = new Vuex.Store(StoreOptions)
-console.log(store)
+
 new Vue({
   render: h => h(App),
   store

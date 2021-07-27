@@ -1,14 +1,14 @@
 <template>
-  <div class="layout">
-    <div class="layout-header">
-      <nav-bar></nav-bar>
-    </div>
+    <div class="layout">
+        <div class="layout-header">
+            <nav-bar></nav-bar>
+        </div>
 
-    <div class="layout-content">
-      <side-panel></side-panel>
-      <app-main></app-main>
+        <div class="layout-content">
+            <side-panel></side-panel>
+            <app-main></app-main>
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -16,10 +16,11 @@ import AppMain from "./components/AppMain";
 import NavBar from "./components/NavBar";
 import SidePanel from "./components/SidePanel";
 export default {
-  name: "Layout",
-  components: { AppMain, NavBar, SidePanel },
+    name: "Layout",
+    components: { AppMain, NavBar, SidePanel },
 };
 </script>
+
 <style lang="scss">
 * {
   padding: 0;

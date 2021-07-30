@@ -6,6 +6,7 @@ export default class CText extends TheElement {
         this.content = data.content;
         this.width = 200;
         this.height = 30;
+        this.loaded = true
     }
 
     toSvg(isAll = true,isDownload) {

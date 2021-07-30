@@ -3,7 +3,7 @@ export default {
         generatorOptions: {
             width: 600,
             height: 600,
-            fps: 30
+            fps: 10
         }
     },
     getter: {

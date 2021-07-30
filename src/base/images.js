@@ -5,9 +5,12 @@ export default class CImage extends TheElement {
         super(data);
         this.src = data.src;
         this.base64 = '';
-        this.width = this.height = 200
+        this.width = this.height = 200;
+        this.loadPromise = this.initBase64();
+        this.loaded = false;
     }
     initBase64() {
+        this.loaded = false;
         return new Promise((resolve,reject) => {
             const img = new Image();
             img.onload = () => {
@@ -15,28 +18,14 @@ export default class CImage extends TheElement {
                 this.canvas.height = this.height;
                 this.context2d.drawImage(img, 0, 0, this.width, this.height);
                 this.base64 =  this.canvas.toDataURL()
-                this.initShot().then(res => {
-                    resolve();
-                })
+                resolve()
+                this.loaded = true;
             }
             img.src = this.src;
         })
     }
     initShot() {
-        return new Promise((resolve,reject) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas')
-                const context2d = canvas.getContext('2d');
-                canvas.width = 200;
-                canvas.height = 200;
-                context2d.drawImage(img,0,0,canvas.width,canvas.height);
-
-                this.canvas = canvas;
-                resolve();
-            }
-            img.src = this.base64;
-        })
+        
     }
     toSvg(isAll = true,isDownload) {
         const src = isDownload? this.base64 : this.src;

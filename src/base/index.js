@@ -2,21 +2,25 @@ import CGif from "./gif";
 import CImage from "./images";
 import CText from "./text";
 import CVideo from "./video";
-import config from "./config";
+import CAPng from "./apng";
+import CAnimate from "./animate";
+import {templateData} from "./config";
 import Utils from '../utils/index'
 class CTemplate {
     constructor(data) {
         this.width = 600;
         this.height = 600;
-        this.fps = 30;
+        this.fps = 10;
         this.gifWidth = this.width;
         this.gifHeight = this.height;
+        this.pageShots = []
 
         this.changeTemplateType();
     }
     changeTemplateType(type) {
-        this.elementsData = config.templateData
-        this.elements = this.elementsData.map(item => {
+        this.elementsData = templateData
+        this.elements = this.elementsData.map((item,index) => {
+            item.key = index;
             switch(item.type) {
                 case 'ctext' :
                     return new CText(item);
@@ -25,15 +29,19 @@ class CTemplate {
                 case 'cgif' :
                     return new CGif(item);
                 case 'cvideo' :
-                        return new CVideo(item);
-            }
+                    return new CVideo(item);
+                case 'capng' :
+                    return new CAPng(item);
+                case 'canimate' :
+                    return new CAnimate(item);
+        }
         })
     }   
-    toSvg(isDownload) {
+    toSvg(isDownload,time) {
         let eleSvg = ''
 
         this.elements.forEach(item => {
-            eleSvg += item.toSvg(false,isDownload);
+            eleSvg += item.toSvg(false,isDownload,time);
         })
         return isDownload ? `
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${this.width} ${this.height}" width="${this.width}" height="${this.height}">
@@ -44,88 +52,55 @@ class CTemplate {
             </svg>
         `: ``
     }
-    getShot() {
-        const gifElements = Utils.filterElements(this.elements, 'cgif');
-        const DOMURL = window.URL || window.webkitURL || window;
-    
-        const maxTime = this.getMaxTime();
-        const fps = 1000 / this.fps;
-        
-        let count = 0;
-        let pageShots = [];
-        let svgBlob = '',svgBlobUrl = '';
-        gifElements.forEach(item => {
-            item.gifRub.play();
-        })
-
-        return new Promise((resolve,reject) => {
-            let shot ='';
-            let now = Date.now();
-            const fn = () => {
-                
-                if(Date.now() - now >= fps) {
-                    now = Date.now();
-                    if(count <= maxTime) {
-                        let svgStr = this.toSvg(true)
-                        this.elements.forEach(item => {
-                            if(['ctext','cimage'].includes(item.type)) {
-                                return;
-                            } else if('cgif' == item.type) {
-                                shot = item.canvas.toDataURL();
-                            } else if('cvideo' == item.type) {
-                                shot = item.initBase64(count);
-                            }
-                            svgStr = svgStr.replace(item.src,shot);
-                        })
-                        svgBlob = new Blob([svgStr], {type: "image/svg+xml"});
-                        svgBlobUrl = DOMURL.createObjectURL(svgBlob);
-                        pageShots.push(svgBlobUrl);
-                    } else {
-                        cancelAnimationFrame(timer);
-                        resolve(pageShots);
-                    }
-                    count += fps;
-                }
-
-                requestAnimationFrame(fn)
-            }
-
-            const timer = requestAnimationFrame(fn);
-        })
-    }
     getMaxTime() {
         const times = this.elements.map(item => {
             if(['ctext','cimage'].includes(item.type)) {
                 return 0
-            } else if('cgif' == item.type) {
-                return item.gifRub.get_duration_ms();
-            } else if('cvideo' == item.type) {
-                return item.duration;
-            }
+            } else if(['cgif','cvideo','capng','canimate'].includes(item.type)) {
+                return item.durationTime;
+            } 
         });
 
         return Math.max(...times)
     }
     generateGif() {
-        const promiseList = [];
-        const imageElements = Utils.filterElements(this.elements, 'cimage');
-        const gifElements = Utils.filterElements(this.elements, 'cgif');
-        
-        imageElements.forEach(item => {
-            promiseList.push(item.initBase64());
-        })
-
-        gifElements.forEach(item => {
-            promiseList.push(item.initShot());
-        })
-
-        return new Promise((resolcve,reject) => {
-            Promise.all(promiseList).then((res) => {
-                this.getShot().then(rt => {
-                    this.pageShots = rt;
-                    resolcve();
+        return new Promise((resolve,reject) => {
+            // 遍历最长时间，fps为30,计算单位时间间隔stepTime
+            // 根据每个元素
+            const maxTime = this.getMaxTime();
+            const stepTime = 1000 / this.fps;
+            const DOMURL = window.URL || window.webkitURL || window;
+            let shot,svgBlob = '',svgBlobUrl = '';
+            
+            for(let time=0;time<maxTime;time+=stepTime) {
+                let svgStr = this.toSvg(true,time)
+                this.elements.forEach(item => {
+                    let idx = 0;
+                    switch (item.type) {
+                        case 'cgif':
+                            idx = ~~(time / item.speed) % item.duration;
+                            shot = item.shotBase64[idx];
+                            svgStr = svgStr.replace(item.src,shot);
+                            break;
+                        case 'cvideo':
+                            idx = ~~(time / item.speed) % item.duration;
+                            console.log(idx,item.duration);
+                            shot = item.shotBase64[idx];
+                            svgStr = svgStr.replace(item.src,shot);
+                            break;
+                        case 'capng':
+                            idx = ~~(time / item.speed) % item.duration;
+                            shot = item.shotBase64[idx];
+                            svgStr = svgStr.replace(item.src,shot);
+                            break;
+                    }
                 })
-            })
+                svgBlob = new Blob([svgStr], {type: "image/svg+xml"});
+                svgBlobUrl = DOMURL.createObjectURL(svgBlob);
+                this.pageShots.push(svgBlobUrl);
+            }
+
+            resolve();
         })
     }
     download() {

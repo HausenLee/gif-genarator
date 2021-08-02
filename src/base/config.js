@@ -61,31 +61,9 @@ export const cssAnimationFrame = {
         timing: 'linear',
         origin: '0 0',
         values: [0,0.2,0.4,0.6,0.8,1],
-        frames: [
-            {
-                
-            },
-            {
-                transform: 'rotate(80)',
-            },
-            {
-                transform: 'rotate(60)',
-            },
-            {
-                transform: 'rotate(80)',
-            },
-            {
-                transform: 'rotate(60)',
-                opacity: 1
-            },
-            {
-                transform: 'translate(0,700)',
-                opacity: 0
-            }
-        ],
         cssFrames: [
             {
-                
+                transform: '',
             },
             {
                 transform: 'rotate(80deg)',
@@ -102,6 +80,27 @@ export const cssAnimationFrame = {
             },
             {
                 transform: 'translate(0,700px)',
+                opacity: 0
+            }
+        ],
+
+        cssFrames1: [
+            {
+                opacity: 1
+            },
+            {
+                opacity: 0
+            },
+            {
+                opacity: 1
+            },
+            {
+                opacity: 0
+            },
+            {
+                opacity: 1
+            },
+            {
                 opacity: 0
             }
         ],

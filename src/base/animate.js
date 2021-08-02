@@ -12,8 +12,8 @@ export default class CText extends TheElement {
         this.loaded = true
         this.animation = cssAnimationFrame[this.animate];
         this.durationTime = this.animation.duration;
-        this.speed = 100;
-        this.duration = this.durationTime / this.speed;
+        this.duration = this.animation.values.length;
+        this.speed = this.durationTime / this.duration ;
     }
 
     getAnimate() {
@@ -42,15 +42,50 @@ export default class CText extends TheElement {
         }
     }
 
+    getMatrix() {
+
+    }
+
     getAnimateFrame(time) {
         const {animation} = this;
-        const index = ~~(time / this.speed) % this.duration;
-        console.log(time,this.speed,index,this.duration)
-            
-        const style = document.getElementById('the-canimate-2').style.transform;
-        console.log(style)
-        // const frame = animation.Frames[index];
+        const indexStart = ~~(time / this.speed) % this.duration;
+        const indexEnd = ~~(time / this.speed + 1) % this.duration;
+        const timeStep = time % this.speed;
+        const timePecent = timeStep / this.speed;
 
+        // console.log(timeStep,this.speed)
+            
+        const styleStart = animation.cssFrames[indexStart];
+        const styleEnd = animation.cssFrames[indexEnd];
+        let styleStr = '';
+        let val = '';
+        Object.keys(styleStart).forEach(key => {
+            let startProp = styleStart[key];
+            let startEnd = styleEnd[key];
+
+            switch(key) {
+                case 'transform':
+                    let matrixStart = new WebKitCSSMatrix(startProp)
+                    let matrixEnd = new WebKitCSSMatrix(startEnd || '')
+                    let matrix = {}
+                    matrix.a = matrixStart.a == 1 && matrixEnd.a == 1 ? 1 : matrixStart.a + (matrixEnd.a - matrixStart.a) * timePecent;
+                    matrix.b = matrixStart.b == 0 && matrixEnd.b == 0 ? 0 : matrixStart.b + (matrixEnd.b - matrixStart.b) * timePecent;
+                    matrix.c = matrixStart.c == 0 && matrixEnd.c == 0 ? 0 : matrixStart.c + (matrixEnd.c - matrixStart.c) * timePecent;
+                    matrix.d = matrixStart.d == 1 && matrixEnd.d == 1 ? 1 : matrixStart.d + (matrixEnd.d - matrixStart.d) * timePecent;
+                    matrix.e = matrixStart.e == 0 && matrixEnd.e == 0 ? 0 : matrixStart.e + (matrixEnd.e - matrixStart.e) * timePecent;
+                    matrix.f = matrixStart.f == 0 && matrixEnd.f == 0 ? 0 : matrixStart.f + (matrixEnd.f - matrixStart.f) * timePecent;
+                    val = `translate(${this.left},${this.top}) matrix(${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f})`;
+                    
+                    break;
+                case 'opacity':
+                    startEnd = startEnd === undefined ? 1 : startEnd;
+                    val = startProp + (startEnd - startProp) * timePecent;
+                    break;
+            }
+
+            styleStr += `${key}="${val}" `
+        })
+        return styleStr;
     }
 
     toSvg(isAll = true,isDownload,time) {
@@ -58,13 +93,13 @@ export default class CText extends TheElement {
 
         if(isDownload) {
             const frameStr = this.getAnimateFrame(time);
-
+            console.log(frameStr);
             svg = `
-                <g transform="translate(${this.left},${this.top})">
-                    <text dy="20" text-anchor="start" fill="black" style="font-size:20px;">
-                        ${this.content}
-                    </text>
-                </g>
+            <g ${frameStr}>
+                <text dy="20" text-anchor="start" fill="black" style="font-size:20px;">
+                    ${this.content}
+                </text>
+            </g>
             `;
         } else {
             const {

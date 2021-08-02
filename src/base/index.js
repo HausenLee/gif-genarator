@@ -43,14 +43,17 @@ class CTemplate {
         this.elements.forEach(item => {
             eleSvg += item.toSvg(false,isDownload,time);
         })
-        return isDownload ? `
+        const svg = isDownload ? `
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${this.width} ${this.height}" width="${this.width}" height="${this.height}">
                 <g transform="translate(0,0)">
-                    <rect x="0" y="0" height="${this.height}" width="${this.width}" style="fill: rgba(0,0,0,0)" />
+                    <rect x="0" y="0" height="${this.height}" width="${this.width}" style="fill: #fff" />
                 </g>
                 ${eleSvg}
             </svg>
         `: ``
+
+        document.querySelector('.svgTest').innerHTML = svg;
+        return svg;
     }
     getMaxTime() {
         const times = this.elements.map(item => {
